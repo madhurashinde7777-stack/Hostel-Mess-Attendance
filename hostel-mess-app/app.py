@@ -24,6 +24,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import backup
 import db as database
 
+# All times in the app (cut-offs, curfew, dates) are India time, also on cloud
+# servers that run on UTC. On Windows the computer's own time zone is used.
+os.environ.setdefault("TZ", "Asia/Kolkata")
+if hasattr(time, "tzset"):
+    time.tzset()
+
 # ---------------------------------------------------------------- config ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = database.SQLITE_PATH   # only used when no PostgreSQL is configured
@@ -45,6 +51,12 @@ STATE_LABEL = {"coming": "Coming", "opted_out": "Not coming", "leave": "On leave
 
 app = Flask(__name__, static_folder=None)
 app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-me")
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    # on the live site (HTTPS) set COOKIE_SECURE=1 so the login cookie is never sent over plain HTTP
+    SESSION_COOKIE_SECURE=os.environ.get("COOKIE_SECURE") == "1",
+)
 
 # -------------------------------------------------------------- database ---
 def connect():
@@ -109,7 +121,8 @@ def append_student_csv(username, name, room, admission_date, biometric_id):
 
 def read_students_csv(path=None):
     """Reads the real student list (students.csv). Columns:
-    username, name, room, admission_date (YYYY-MM-DD), biometric_id (optional)."""
+    username, name, room, role (always "student"), admission_date (YYYY-MM-DD),
+    biometric_id (optional). Rows with any other role are ignored."""
     path = path or STUDENTS_CSV
     if not os.path.exists(path):
         return []
@@ -117,6 +130,9 @@ def read_students_csv(path=None):
         rows = []
         for r in csv.DictReader(f):
             r = {(k or "").strip().lower(): (v or "").strip() for k, v in r.items()}
+            if (r.get("role") or "student").lower() != "student":
+                print(f"  students.csv: skipped {r.get('username')} (role must be 'student')")
+                continue
             if r.get("username") and r.get("name"):
                 r["username"] = r["username"].lower()
                 rows.append(r)
@@ -387,22 +403,17 @@ def api_health():
         }), 500
 
 
+# ------------------------------------------------------------------ auth ---
 @app.post("/api/login")
 def api_login():
-    try:
-        b = body()
-        username = str(b.get("username", "")).strip().lower()
-        password = str(b.get("password", "")).strip()
-        u = get_db().execute("SELECT * FROM users WHERE username=? AND active=1",
-                             (username,)).fetchone()
-        if not u or not check_password_hash(u["password_hash"], password):
-            return err("Wrong username or password.", 401)
-        session.clear()
-        session.update(uid=u["id"], role=u["role"], name=u["name"])
-        return jsonify(user=user_json(u))
-    except Exception as e:
-        app.logger.exception("Login error:")
-        return err(f"Database error: {str(e)}", 500)
+    b = body()
+    u = get_db().execute("SELECT * FROM users WHERE username=? AND active=1",
+                         (str(b.get("username", "")).strip().lower(),)).fetchone()
+    if not u or not check_password_hash(u["password_hash"], str(b.get("password", "")).strip()):
+        return err("Wrong username or password.", 401)
+    session.clear()
+    session.update(uid=u["id"], role=u["role"], name=u["name"])
+    return jsonify(user=user_json(u))
 
 
 @app.post("/api/logout")
@@ -758,7 +769,7 @@ def spa(path=""):
 
 @app.route("/api/cron", methods=["GET", "POST"])
 def cron_trigger():
-    """Triggered by Vercel Cron or external ping to freeze meals passing cut-off."""
+    """Triggered by an external scheduler to freeze meals passing cut-off."""
     try:
         conn = connect()
         freeze_due_meals(conn)
@@ -786,9 +797,25 @@ def scheduler_loop():
         time.sleep(60)
 
 
+_scheduler_started = False
+
+
+def start_scheduler():
+    """Starts the background scheduler once per process.
+    Locally `python app.py` calls it; on Railway gunicorn.conf.py calls it."""
+    global _scheduler_started
+    if _scheduler_started:
+        return
+    _scheduler_started = True
+    threading.Thread(target=scheduler_loop, daemon=True, name="scheduler").start()
+
+
+if app.secret_key == "dev-secret-change-me" and os.environ.get("COOKIE_SECURE") == "1":
+    print("WARNING: SECRET_KEY is not set. Add a long random SECRET_KEY variable before going live.")
+
 if __name__ == "__main__":
     init_db()
-    threading.Thread(target=scheduler_loop, daemon=True).start()
+    start_scheduler()
     port = int(os.environ.get("PORT", "5000"))
     print(f"\n  MessMate backend running on http://localhost:{port}")
     print(f"  Database: {database.describe()}")

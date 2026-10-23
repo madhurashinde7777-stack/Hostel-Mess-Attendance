@@ -1,4 +1,3 @@
-
 .env
 .git
 .venv
@@ -7,6 +6,9 @@ __pycache__
 *.pyc
 node_modules
 frontend/node_modules
-backups
+frontend/dist
+backups/
 hostel.db
+hostel.db.*
 students.csv
+Downloads/

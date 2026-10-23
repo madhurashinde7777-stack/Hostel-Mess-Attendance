@@ -1,59 +1,19 @@
 import { useState } from 'react'
 import { useAuth } from '../auth.jsx'
+import { Icon, Logo } from '../icons.jsx'
+import { Button } from '../ui.jsx'
 
-/* ── inline SVG icons so the login page has zero extra deps ── */
-function UserIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
-  )
-}
-function LockIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-    </svg>
-  )
-}
-function EyeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-      <circle cx="12" cy="12" r="3"/>
-    </svg>
-  )
-}
-function EyeOffIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-      <line x1="1" y1="1" x2="23" y2="23"/>
-    </svg>
-  )
-}
-function ArrowRightIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="5" y1="12" x2="19" y2="12"/>
-      <polyline points="12 5 19 12 12 19"/>
-    </svg>
-  )
-}
-function BuildingIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="10" width="18" height="12"/>
-      <path d="M3 10l9-7 9 7"/>
-      <line x1="9" y1="22" x2="9" y2="14"/>
-      <line x1="15" y1="22" x2="15" y2="14"/>
-      <rect x="9" y="14" width="6" height="8"/>
-    </svg>
-  )
-}
+const DEMO = [
+  { role: 'Student', username: 's001', password: 'pass123', icon: 'utensils' },
+  { role: 'Rector', username: 'rector', password: 'rector123', icon: 'shield' },
+  { role: 'Mess', username: 'mess', password: 'mess123', icon: 'chart' },
+]
+
+const FEATURES = [
+  { icon: 'check', title: 'Tap to skip a meal', text: 'Students mark lunch and dinner from their phone.' },
+  { icon: 'bolt', title: 'Counts update live', text: 'The mess sees the exact number of plates to cook.' },
+  { icon: 'shield', title: 'No more roll calls', text: 'The rector sees who is in, out or at home at a glance.' },
+]
 
 export default function Login() {
   const { login } = useAuth()
@@ -76,75 +36,88 @@ export default function Login() {
   }
 
   return (
-    <div style={styles.root}>
-      {/* Background image with dark overlay */}
-      <div style={styles.bg} />
-      <div style={styles.overlay} />
-
-      {/* Top Navbar */}
-      <nav style={styles.navbar}>
-        <div style={styles.navBrand}>
-          <div style={styles.navIconWrap}>
-            <BuildingIcon />
-          </div>
-          <div style={styles.navBrandText}>
-            <span style={styles.navTitle}>M.S.G.G. Shikshan Sanstha</span>
-            <span style={styles.navSub}>Kolhapur · Hostel Management</span>
+    <div className="login">
+      <section className="login-art">
+        <div className="login-brand">
+          <Logo size={44} />
+          <div>
+            <b>MessMate</b>
+            <small>Hostel mess attendance</small>
           </div>
         </div>
-        <div style={styles.navTagline}>
-          Safe Stay&nbsp;•&nbsp;Better Learning&nbsp;•&nbsp;Brighter Future
+
+        <div className="login-hero">
+          <span className="eyebrow">For girls' hostels</span>
+          <h1>
+            Every plate counted.
+            <br />
+            <em>No roll calls.</em>
+          </h1>
+          <p>Students mark their meals, the count updates by itself and the mess always knows how much to cook.</p>
+          <ul className="features">
+            {FEATURES.map((f) => (
+              <li key={f.title}>
+                <span className="feature-icon">
+                  <Icon name={f.icon} size={16} />
+                </span>
+                <div>
+                  <b>{f.title}</b>
+                  <span>{f.text}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-      </nav>
 
-      {/* Centered Login Card */}
-      <main style={styles.main}>
-        <form style={styles.card} onSubmit={submit} noValidate>
-          {/* Institution icon */}
-          <div style={styles.iconWrap}>
-            <BuildingIcon />
+        {/* decorative thali plates */}
+        <svg className="plates" viewBox="0 0 400 400" aria-hidden="true">
+          <circle cx="300" cy="300" r="150" />
+          <circle cx="300" cy="300" r="110" />
+          <circle cx="300" cy="300" r="46" />
+          <circle cx="232" cy="236" r="18" />
+          <circle cx="368" cy="236" r="18" />
+          <circle cx="300" cy="392" r="18" />
+          <circle cx="60" cy="70" r="40" />
+          <circle cx="60" cy="70" r="24" />
+        </svg>
+      </section>
+
+      <section className="login-panel">
+        <form className="login-card" onSubmit={submit}>
+          <div className="login-mobile-brand">
+            <Logo size={40} />
+            <b>MessMate</b>
           </div>
+          <h2>Welcome back</h2>
+          <p className="muted">Sign in to continue</p>
 
-          <h1 style={styles.heading}>Welcome Back</h1>
-          <p style={styles.subheading}>Sign in to M.S.G.G. Shikshan Sanstha Hostel Mess</p>
-
-          {/* Error */}
           {error && (
-            <div style={styles.errorBox}>
-              {error}
+            <div className="alert alert-error">
+              <Icon name="alert" size={16} /> {error}
             </div>
           )}
 
-          {/* Username */}
-          <div style={styles.fieldGroup}>
-            <div style={styles.fieldIconRow}>
-              <span style={styles.fieldIcon}><UserIcon /></span>
-              <span style={styles.fieldLabel}>Username</span>
-            </div>
-            <input
-              id="login-username"
-              style={styles.input}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              autoFocus
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck="false"
-              required
-            />
-          </div>
-
-          {/* Password */}
-          <div style={styles.fieldGroup}>
-            <div style={styles.fieldIconRow}>
-              <span style={styles.fieldIcon}><LockIcon /></span>
-              <span style={styles.fieldLabel}>Password</span>
-            </div>
-            <div style={styles.passwordWrap}>
+          <label className="field">
+            <span className="field-label">Username</span>
+            <div className="input-icon">
+              <Icon name="users" size={16} />
               <input
-                id="login-password"
-                style={{ ...styles.input, paddingRight: '48px' }}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="e.g. s001"
+                autoFocus
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
+                required
+              />
+            </div>
+          </label>
+          <label className="field">
+            <span className="field-label">Password</span>
+            <div className="input-icon">
+              <Icon name="lock" size={16} />
+              <input
                 type={show ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -152,288 +125,39 @@ export default function Login() {
                 autoCapitalize="none"
                 required
               />
-              <button
-                type="button"
-                style={styles.eyeBtn}
-                onClick={() => setShow(!show)}
-                aria-label={show ? 'Hide password' : 'Show password'}
-              >
-                {show ? <EyeOffIcon /> : <EyeIcon />}
+              <button type="button" className="input-action" onClick={() => setShow(!show)} aria-label="Show password">
+                <Icon name={show ? 'eyeOff' : 'eye'} size={16} />
               </button>
             </div>
+          </label>
+
+          <Button variant="primary" size="lg" className="block" loading={loading} icon="login">
+            Sign in
+          </Button>
+
+          {import.meta.env.DEV && (
+          <div className="demo">
+            <span>Try a demo account</span>
+            <div className="demo-chips">
+              {DEMO.map((d) => (
+                <button
+                  type="button"
+                  key={d.role}
+                  className="demo-chip"
+                  onClick={() => {
+                    setUsername(d.username)
+                    setPassword(d.password)
+                    setError('')
+                  }}
+                >
+                  <Icon name={d.icon} size={14} /> {d.role}
+                </button>
+              ))}
+            </div>
           </div>
-
-          {/* Submit */}
-          <button
-            id="login-submit"
-            type="submit"
-            style={loading ? { ...styles.submitBtn, ...styles.submitBtnLoading } : styles.submitBtn}
-            disabled={loading}
-          >
-            {loading ? (
-              <span style={styles.spinner} />
-            ) : (
-              <ArrowRightIcon />
-            )}
-            {loading ? 'Signing in…' : 'Sign In To Dashboard'}
-          </button>
+          )}
         </form>
-      </main>
-
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <span>© {new Date().getFullYear()} <strong>M.S.G.G. Shikshan Sanstha · Kolhapur</strong> · Hostel Mess Management</span>
-        <span style={styles.footerDivider}>•</span>
-        <span>Developed &amp; Maintained by <strong style={{ color: '#fff', fontWeight: 600 }}>Lokare's Infotech</strong></span>
-      </footer>
+      </section>
     </div>
   )
-}
-
-/* ── Styles ── */
-const GREEN = '#1a7a4a'
-const GREEN_DARK = '#145f39'
-const GREEN_LIGHT = '#e8f5ee'
-
-const styles = {
-  root: {
-    position: 'relative',
-    minHeight: '100vh',
-    display: 'flex',
-    flexDirection: 'column',
-    fontFamily: "'Inter', 'Segoe UI', sans-serif",
-    overflowY: 'auto',
-  },
-  bg: {
-    position: 'fixed',
-    inset: 0,
-    backgroundImage: 'url(/hostel_bg.jpg)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    filter: 'blur(3px) brightness(0.55)',
-    transform: 'scale(1.05)',
-    zIndex: 0,
-  },
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.35)',
-    zIndex: 1,
-  },
-  /* Navbar */
-  navbar: {
-    position: 'relative',
-    zIndex: 10,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '18px 48px',
-    background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)',
-    flexWrap: 'wrap',
-    gap: '12px',
-  },
-  navBrand: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  navIconWrap: {
-    width: '42px',
-    height: '42px',
-    borderRadius: '10px',
-    background: GREEN,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-  },
-  navBrandText: {
-    display: 'flex',
-    flexDirection: 'column',
-    lineHeight: 1.2,
-  },
-  navTitle: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: '17px',
-    letterSpacing: '0.01em',
-  },
-  navSub: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: '12px',
-    fontWeight: '400',
-  },
-  navTagline: {
-    color: 'rgba(255,255,255,0.88)',
-    fontSize: '13px',
-    fontWeight: '500',
-    letterSpacing: '0.02em',
-  },
-  /* Main */
-  main: {
-    position: 'relative',
-    zIndex: 1,
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px 16px 36px',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '440px',
-    background: '#ffffff',
-    borderRadius: '20px',
-    padding: '36px 36px 32px',
-    boxShadow: '0 25px 60px rgba(0, 0, 0, 0.45)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    boxSizing: 'border-box',
-  },
-  iconWrap: {
-    width: '60px',
-    height: '60px',
-    borderRadius: '16px',
-    background: GREEN,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '16px',
-    boxShadow: `0 8px 24px ${GREEN}44`,
-  },
-  heading: {
-    margin: '0 0 6px 0',
-    fontSize: '24px',
-    fontWeight: '800',
-    color: '#1a1a2e',
-    textAlign: 'center',
-    letterSpacing: '-0.02em',
-  },
-  subheading: {
-    margin: '0 0 24px 0',
-    fontSize: '14px',
-    color: '#71717a',
-    textAlign: 'center',
-  },
-  errorBox: {
-    width: '100%',
-    padding: '10px 14px',
-    background: '#fef2f2',
-    border: '1px solid #fecaca',
-    borderRadius: '10px',
-    color: '#b91c1c',
-    fontSize: '13px',
-    marginBottom: '18px',
-    textAlign: 'center',
-    boxSizing: 'border-box',
-  },
-  /* Fields */
-  fieldGroup: {
-    width: '100%',
-    marginBottom: '18px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  fieldIconRow: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '8px',
-    color: '#27272a',
-  },
-  fieldIcon: {
-    color: GREEN,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  fieldLabel: {
-    fontSize: '14px',
-    fontWeight: '700',
-    color: '#1f2937',
-  },
-  input: {
-    width: '100%',
-    padding: '14px 18px',
-    background: '#eef4fb',
-    border: '1.5px solid transparent',
-    borderRadius: '12px',
-    fontSize: '15px',
-    color: '#1a1a2e',
-    outline: 'none',
-    boxSizing: 'border-box',
-    transition: 'border-color 0.2s, background 0.2s',
-    fontFamily: 'inherit',
-  },
-  passwordWrap: {
-    position: 'relative',
-    width: '100%',
-  },
-  eyeBtn: {
-    position: 'absolute',
-    right: '14px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: GREEN,
-    display: 'flex',
-    alignItems: 'center',
-    padding: '4px',
-  },
-  /* Submit button */
-  submitBtn: {
-    width: '100%',
-    padding: '15px 24px',
-    background: GREEN,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '12px',
-    fontSize: '15.5px',
-    fontWeight: '700',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '10px',
-    marginTop: '8px',
-    letterSpacing: '0.01em',
-    transition: 'background 0.2s, transform 0.1s, box-shadow 0.2s',
-    boxShadow: `0 4px 16px ${GREEN}44`,
-    fontFamily: 'inherit',
-  },
-  submitBtnLoading: {
-    background: GREEN_DARK,
-    cursor: 'not-allowed',
-  },
-  spinner: {
-    display: 'inline-block',
-    width: '16px',
-    height: '16px',
-    border: '2px solid rgba(255,255,255,0.4)',
-    borderTopColor: '#fff',
-    borderRadius: '50%',
-    animation: 'spin 0.7s linear infinite',
-  },
-  footer: {
-    position: 'relative',
-    zIndex: 10,
-    padding: '16px 24px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-    flexWrap: 'wrap',
-    fontSize: '13px',
-    color: 'rgba(255, 255, 255, 0.8)',
-    background: 'rgba(10, 15, 25, 0.6)',
-    backdropFilter: 'blur(10px)',
-    borderTop: '1px solid rgba(255, 255, 255, 0.12)',
-    textAlign: 'center',
-  },
-  footerDivider: {
-    color: 'rgba(255, 255, 255, 0.35)',
-  },
 }
