@@ -78,6 +78,8 @@ hostel-mess-app/
             └── Account.jsx         # Change password (all roles)
 ```
 
+For the full system architecture, data model, user workflows, deployment options, and multi-hostel rollout considerations, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ## Requirements
 - Python 3.10+
 - Node.js 18+ (LTS) — https://nodejs.org
